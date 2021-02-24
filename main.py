@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from cockroachdb.sqlalchemy import run_transaction
 
+# tags for documentation page
 tags_metadata = [
   {
     "name": "Documentation",
@@ -23,12 +24,14 @@ tags_metadata = [
   }
 ]
 
+# create api
 app = FastAPI(
   title="FastApi + CockroachDB Example Project",
   description="An api to use as future reference - Created by Julien Bertazzo Lambert",
   version="0.1.0",
   openapi_tags=tags_metadata
 )
+# base for sqlalchemy models
 Base = declarative_base()
 
 # Database Model
@@ -46,13 +49,16 @@ class SportsCreate(BaseModel):
   name: str
   description: str
 
+# db engine
 engine = create_engine(
   f"cockroachdb://julien:{CDB_PASS}@free-tier.gcp-us-central1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&sslrootcert=certs/cc-ca.crt&options=--cluster=good-bat-867",
   echo=True
 )
+# initialize
 Base.metadata.create_all(engine)
 sessionmaker = sessionmaker(engine)
 
+# api routes
 @app.get('/', tags=['Documentation'])
 def root():
   return RedirectResponse('/docs', 301)
