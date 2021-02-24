@@ -14,7 +14,7 @@ class Sports(Base):
   description = Column(String(500), nullable=False)
 
   def __repr__(self):
-    return f"<Sports(name={self.name}, description={self.description}>"
+    return f"{self.name}: {self.description}"
 
 engine = create_engine(
   f"cockroachdb://julien:{CDB_PASS}@free-tier.gcp-us-central1.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&sslrootcert=certs/cc-ca.crt&options=--cluster=good-bat-867",
@@ -24,16 +24,16 @@ Base.metadata.create_all(engine)
 sessionmaker = sessionmaker(engine)
 
 @app.get('/sports')
-def root():
+def get_sports():
   def callback(session):
-    return session.query(Sports).first()
+    return str(session.query(Sports).all())
   sport = run_transaction(sessionmaker, callback)
-  return {"sports": sport.name}
+  return {"sports": sport}
 
 @app.post('/sports')
-def root():
+def post_sport():
   def callback(session):
-    sport = Sports(id=0, name='basketball', description='basketball')
+    sport = Sports(id=3, name='basketball', description='basketball')
     session.add(sport)
   run_transaction(sessionmaker, callback)
   return {"message": "success"}
